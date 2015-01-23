@@ -22,18 +22,16 @@ public class MockListener extends NanoHTTPD {
 
 		if (query.equals("wsdl"))
 		{
-			String bodyText = getBodyText(session);
-			boolean requestIsForWsdl = bodyText == null;
+			boolean requestIsForWsdl = (getBodyText(session) == null);
 			if (requestIsForWsdl)
 				return getWsdl(session);
 			else
-			{
 				return getResponse();
-			}
 		}
 
 		return new NanoHTTPD.Response("Something went wrong.");
 	}
+	
 
 	private String getBodyText(IHTTPSession session) {
 		String returnMe = null;

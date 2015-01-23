@@ -1,20 +1,19 @@
 package com.suprtek.SoapMock;
+
 import java.io.IOException;
 
-import fi.iki.elonen.*;
+public class Launcher {
 
-public class dummyMain {
-
-	public static void main(String[] args) {
-
-		MockListener Mock = new MockListener(8080);
+	public Launcher(int port) {
+		
+		MockListener Mock = new MockListener(port);
 		try {
 			Mock.start();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		
-		while(true)
+
+		while (true)
 			try {
 				Thread.sleep(100);
 			} catch (InterruptedException e) {
@@ -22,4 +21,6 @@ public class dummyMain {
 			}
 	}
 
+	
+	
 }
