@@ -6,11 +6,9 @@ import fi.iki.elonen.NanoHTTPD;
 import fi.iki.elonen.NanoHTTPD.Response.Status;
 
 public class MockListener extends NanoHTTPD {
-	private FileHandler files;
 
 	public MockListener(int port) {
 		super(port);
-		files = new FileHandler("C:\\temp");
 	}
 
 	@Override
@@ -18,34 +16,15 @@ public class MockListener extends NanoHTTPD {
 
 		boolean requestIsForIcon = session.getUri().endsWith(".ico");
 		if (requestIsForIcon)
-		{
-			System.out.println("ico");
 			return new NanoHTTPD.Response(":(");
-		}	
 		
-		String query = null;
-		if (session.getQueryParameterString() != null){			
-			query = session.getQueryParameterString().toLowerCase();
-		}
-		
-		String bodyText = null;
-		try {
-			if (session.getInputStream().available() > 0)
-			{
-				byte[] bodyBytes = new byte[session.getInputStream().available()];
-				session.getInputStream().read(bodyBytes, 0, session.getInputStream().available()-1);
-				bodyText = new String(bodyBytes);
-				System.out.println(bodyText);
-			}
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		
-		
+		String query = getQueryFromSession(session);
+
 		if (query.equals("wsdl"))
 		{
-			boolean respondWithWSDL = bodyText == null;
-			if (respondWithWSDL)
+			String bodyText = getBodyText(session);
+			boolean requestIsForWsdl = bodyText == null;
+			if (requestIsForWsdl)
 				return getWsdl(session);
 			else
 			{
@@ -56,11 +35,35 @@ public class MockListener extends NanoHTTPD {
 		return new NanoHTTPD.Response("Something went wrong.");
 	}
 
+	private String getBodyText(IHTTPSession session) {
+		String returnMe = null;
+		try {
+			if (session.getInputStream().available() > 0)
+			{
+				byte[] bodyBytes = new byte[session.getInputStream().available()];
+				session.getInputStream().read(bodyBytes, 0, session.getInputStream().available()-1);
+				returnMe = new String(bodyBytes);
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return returnMe;
+	}
+
+	private String getQueryFromSession(IHTTPSession session) {
+		String returnMe = null;
+		if (session.getQueryParameterString() != null){			
+			returnMe = session.getQueryParameterString().toLowerCase();
+		}
+		return returnMe;
+	}
+
 	private Response getWsdl(IHTTPSession session) {
+		FileHandler files = new FileHandler("C:\\temp");
 		return new NanoHTTPD.Response(Status.OK, "text/xml", files.getWSDL(session.getUri()));
 	}
 	private Response getResponse() {
-		// TODO Auto-generated method stub
+		// TODO Implement
 		return null;
 	}
 	
