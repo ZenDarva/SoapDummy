@@ -11,26 +11,22 @@ public class FileHandler {
 	public FileHandler(String TopLevelPath)
 	{
 		topLevelPath = TopLevelPath;
-		System.out.println("Hi, i'm here");
+		System.out.println("topLevelPath: " + topLevelPath);
 	}
 	
 	public String getWSDL(String path)
-	{
-		File target;
-		byte[] result = null;
-		
-		target = new File(topLevelPath + path+path +".wsdl");
-		
-		
-		if (target == null || target.exists() == false)
+	{		
+		File wsdlFile = new File(topLevelPath + path+path +".wsdl");		
+		boolean wsdlFileInvalid = wsdlFile == null || wsdlFile.exists() == false;
+		if (wsdlFileInvalid)
 			return null;
 		
+		byte[] returnMe = null;
 		try {
-			result = Files.readAllBytes(target.toPath());
+			returnMe = Files.readAllBytes(wsdlFile.toPath());
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		return new String(result);
-	}
-	
+		return new String(returnMe);		
+	}	
 }
