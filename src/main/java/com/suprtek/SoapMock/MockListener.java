@@ -1,6 +1,5 @@
 package com.suprtek.SoapMock;
 
-import java.io.BufferedInputStream;
 import java.io.IOException;
 
 import fi.iki.elonen.NanoHTTPD;
@@ -9,36 +8,31 @@ import fi.iki.elonen.NanoHTTPD.Response.Status;
 public class MockListener extends NanoHTTPD {
 	private FileHandler files;
 
-	public MockListener() {
-		super(8080);
+	public MockListener(int port) {
+		super(port);
 		files = new FileHandler("C:\\temp");
 	}
-	
-	
 
 	@Override
 	public Response serve(IHTTPSession session) {
-		String query = null;
-		String bodyText = null;
-		byte[] bodyBytes;
 
-		
-		
-		if (session.getUri().endsWith(".ico"))
+		boolean requestIsForIcon = session.getUri().endsWith(".ico");
+		if (requestIsForIcon)
 		{
-			//go away you horrible browser you.
 			System.out.println("ico");
 			return new NanoHTTPD.Response(":(");
-		}
+		}	
 		
+		String query = null;
 		if (session.getQueryParameterString() != null){			
 			query = session.getQueryParameterString().toLowerCase();
 		}
 		
+		String bodyText = null;
 		try {
 			if (session.getInputStream().available() > 0)
 			{
-				bodyBytes = new byte[session.getInputStream().available()];
+				byte[] bodyBytes = new byte[session.getInputStream().available()];
 				session.getInputStream().read(bodyBytes, 0, session.getInputStream().available()-1);
 				bodyText = new String(bodyBytes);
 				System.out.println(bodyText);
@@ -50,15 +44,24 @@ public class MockListener extends NanoHTTPD {
 		
 		if (query.equals("wsdl"))
 		{
-			if (bodyText == null)
-				return new NanoHTTPD.Response(Status.OK, "text/xml", files.getWSDL(session.getUri()));
+			boolean respondWithWSDL = bodyText == null;
+			if (respondWithWSDL)
+				return getWsdl(session);
 			else
 			{
-				//Write code here.
+				return getResponse();
 			}
 		}
 
-		return new NanoHTTPD.Response("This is a tribute");
+		return new NanoHTTPD.Response("Something went wrong.");
+	}
+
+	private Response getWsdl(IHTTPSession session) {
+		return new NanoHTTPD.Response(Status.OK, "text/xml", files.getWSDL(session.getUri()));
+	}
+	private Response getResponse() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 	
 	

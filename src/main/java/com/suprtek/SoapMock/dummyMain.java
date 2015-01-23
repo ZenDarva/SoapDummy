@@ -6,12 +6,11 @@ import fi.iki.elonen.*;
 public class dummyMain {
 
 	public static void main(String[] args) {
-		// TODO Auto-generated method stub
-		MockListener Mock = new MockListener();
+
+		MockListener Mock = new MockListener(8080);
 		try {
 			Mock.start();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		
@@ -19,7 +18,6 @@ public class dummyMain {
 			try {
 				Thread.sleep(100);
 			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 	}
