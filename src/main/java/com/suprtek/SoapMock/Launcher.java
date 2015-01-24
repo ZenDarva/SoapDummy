@@ -9,12 +9,14 @@ public class Launcher {
 	}
 
 	void launch(MockListener mock) {
+		System.out.println("launch start");
 		try {
 			mock.start();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 		 keepAlive();
+			System.out.println("launch stop");
 	}
 
 	private void keepAlive() {

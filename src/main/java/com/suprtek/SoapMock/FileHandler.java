@@ -2,6 +2,7 @@ package com.suprtek.SoapMock;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Files;
 
 public class FileHandler {
@@ -28,5 +29,10 @@ public class FileHandler {
 			e.printStackTrace();
 		}
 		return new String(returnMe);		
+	}
+
+	public InputStream getResponse(String uri) {
+		// TODO Auto-generated method stub
+		return null;
 	}	
 }
