@@ -27,20 +27,18 @@ public class MockListener extends NanoHTTPD {
 
 		String query = getQueryFromSession(session);
 
-		if (query.equals("wsdl")) {
-			boolean requestIsForWsdl = (getBodyText(session) == null);
-			if (requestIsForWsdl){
+		if (query != null) {
+			boolean requestIsForWsdl = query.equals("wsdl")
+					&& (getBodyText(session) == null);
+			if (requestIsForWsdl) {
 				System.out.println("requestIsForWsdl");
 				return getWsdl(session);
-
-			}
-			else{
-				System.out.println("requestIsForWsdl");
-				return getResponse(session);
 			}
 		}
 
-		return new NanoHTTPD.Response("Something went wrong.");
+		System.out.println("requestIsForWsdl");
+		return getResponse(session);
+
 	}
 
 	private String getBodyText(IHTTPSession session) {
@@ -69,8 +67,7 @@ public class MockListener extends NanoHTTPD {
 
 	private Response getWsdl(IHTTPSession session) {
 		ResponseDirectoryGetter responseDirectoryGetter = new ResponseDirectoryGetter();
-		FileHandler files = new FileHandler(
-				responseDirectoryGetter.getResponsesDirectoryPath());
+		FileHandler files = new FileHandler();
 		return new NanoHTTPD.Response(Status.OK, "text/xml",
 				files.getWSDL(session.getUri()));
 	}
@@ -89,18 +86,20 @@ public class MockListener extends NanoHTTPD {
 			return new Response(e.getStatus(), MIME_PLAINTEXT, e.getMessage());
 
 		}
-		parsedBody.get("Action");
-		int hashedRequestBody = parsedBody.get("Action").hashCode();
-		//
-		FileHandler files = getFileHandler();
+		String requestedAction = parsedBody.get("Action");
+		int hashedRequestBody = 0;
+
+		if(requestedAction != null){
+			hashedRequestBody = parsedBody.get("Action").hashCode();
+		}
+		FileHandler fileHandler = getFileHandler();
 		return new NanoHTTPD.Response(Status.OK, "text/xml",
-				files.getResponse(session.getUri()));
+				fileHandler.getResponse(session.getUri(), hashedRequestBody));
 	}
 
 	private FileHandler getFileHandler() {
 		ResponseDirectoryGetter responseDirectoryGetter = new ResponseDirectoryGetter();
-		FileHandler returnMe = new FileHandler(
-				responseDirectoryGetter.getResponsesDirectoryPath());
+		FileHandler returnMe = new FileHandler();
 		return returnMe;
 	}
 

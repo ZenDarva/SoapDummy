@@ -7,17 +7,16 @@ import java.nio.file.Files;
 
 public class FileHandler {
 
-	private String topLevelPath;
+//	private String topLevelPath;
 	
-	public FileHandler(String TopLevelPath)
+	public FileHandler()
 	{
-		topLevelPath = TopLevelPath;
-		System.out.println("topLevelPath: " + topLevelPath);
+		System.out.println("topLevelPath: " + getResponseDirectoryPath());
 	}
 	
 	public String getWSDL(String path)
 	{		
-		File wsdlFile = new File(topLevelPath + path+path +".wsdl");		
+		File wsdlFile = new File(getResponseDirectoryPath() + path+path +".wsdl");		
 		boolean wsdlFileInvalid = wsdlFile == null || wsdlFile.exists() == false;
 		if (wsdlFileInvalid)
 			return null;
@@ -31,8 +30,23 @@ public class FileHandler {
 		return new String(returnMe);		
 	}
 
-	public InputStream getResponse(String uri) {
-		// TODO Auto-generated method stub
-		return null;
+	public String getResponse(String path, int hashKey) {
+		File responseFile = new File(getResponseDirectoryPath() + path + File.separator + hashKey +".soapResponse");		
+		boolean responseFileMissing = responseFile == null || responseFile.exists() == false;
+		if (responseFileMissing)
+			return null;
+		
+		byte[] returnMe = null;
+		try {
+			returnMe = Files.readAllBytes(responseFile.toPath());
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return new String(returnMe);
 	}	
+	
+	private String getResponseDirectoryPath(){
+		ResponseDirectoryGetter responseDirectoryGetter = new ResponseDirectoryGetter(); 
+		return responseDirectoryGetter.getResponsesDirectoryPath();
+	}
 }

@@ -75,7 +75,7 @@ public class MockListenerTest {
 
 		Response testResult = testObject.serve(mockihttpSession);
 
-		FileHandler files = new FileHandler("C:\\temp");
+		FileHandler files = new FileHandler();
 		Response expectedResult = new NanoHTTPD.Response(Status.OK, "text/xml",
 				files.getWSDL(mockihttpSession.getUri()));
 

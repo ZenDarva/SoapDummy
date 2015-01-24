@@ -1,0 +1,309 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<definitions name="CatalogSearch" 
+   xmlns="http://schemas.xmlsoap.org/wsdl/" 
+   xmlns:xsd="http://www.w3.org/2001/XMLSchema" 
+   xmlns:http="http://schemas.xmlsoap.org/wsdl/http/" 
+   xmlns:mime="http://schemas.xmlsoap.org/wsdl/mime/"
+   xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" 
+   targetNamespace="urn:IRSACatalogSearch" 
+   xmlns:tns="urn:IRSACatalogSearch">
+
+  <documentation>
+
+    A General Service for Interacting with IRSA Catalog Data  
+
+  </documentation>
+
+
+
+  <types>
+    <documentation>
+
+      DATA STRUCTURES (TYPES)  -  This service deals in the
+      subsetting of astronomical catalogs.  Basically, this is a
+      three-step process if you are starting cold:  Get the list of
+      catalogs; get the description of a particular catalog (fields
+      names, etc.); and submit a query (SQL where clause and
+      specialized positional constraints).  The structures defined
+      here represent the back-and-forth associated with these
+      exchanges.  Since these are all instantiated using HTTP
+      GET/POST, there doesn't seem to be a particularly elegant way to
+      handle notification operations.  Since we are actually
+      implementing that, we will most likely instantiate all this
+      functionality using SOAP.  However, this description is close
+      enough (though not close enough to actually use) to our current
+      web services to make the relationships clear.
+
+      There are a few areas where I've used 'xsd:string' base
+      datatypes, etc. when some explicit community-defined schema
+      would be more appropriate.  For instance, the search element
+      'location' should probably be type 'nvo:location' or, more
+      generally, their should be a standard 'nvo:spatialConstraint'
+      with a 'nvo:location'/'nvo:radius' pair as one option (polygonal
+      constraints being another).
+
+    </documentation>
+
+    <schema xmlns="http://www.w3.org/2001/XMLSchema" 
+            targetNamespace="urn:IRSACatalogSearch">
+
+      <complexType name="CatalogInfoElement">
+        <sequence>
+          <element name="catalogName"        type="string"/>
+          <element name="catalogDescription" type="string"/>
+          <element name="serverName"         type="string"/>
+          <element name="databaseName"       type="string"/>
+          <element name="schemaName"         type="string"/>
+          <element name="columnCount"        type="integer"/>
+          <element name="rowCount"           type="integer"/>
+          <element name="coneradius"         type="double" minOccurs="0"/>
+          <element name="uploadradius"       type="double" minOccurs="0"/>
+          <element name="version"            type="string" minOccurs="0"/>
+          <element name="versionDate"        type="date"   minOccurs="0"/>
+          <element name="projectName"        type="string" minOccurs="0"/>
+          <element name="infoURL"            type="anyURI" minOccurs="0"/>
+          <element name="whereExample"       type="string" minOccurs="0"
+                                             maxOccurs="unbounded"/>
+        </sequence>
+      </complexType>
+
+      <complexType name="CatalogInfoArray">
+        <complexContent>
+          <element name="schema" type="tns:CatalogInfoElement" 
+		   maxOccurs="unbounded"/>
+        </complexContent>
+      </complexType>
+
+      <complexType name="CatalogSchemaRequest">
+        <sequence>
+          <element name="database"    type="string"/>
+          <element name="catalogName" type="string"/>
+        </sequence>
+      </complexType>
+
+      <complexType name="CatalogSchemaElement">
+        <sequence>
+          <element name="fieldName"         type="string"               />
+          <element name="originalFieldName" type="string"  minOccurs="0"/>
+          <element name="fieldDescription"  type="string"               />
+          <element name="units"             type="string"  minOccurs="0"/>
+          <element name="inputType"         type="string"  minOccurs="0"/>
+          <element name="outputFormat"      type="string"               />
+          <element name="databaseFieldType" type="string"  minOccurs="0"/>
+          <element name="canBeNull"         type="boolean" minOccurs="0"/>
+          <element name="isIndexed"         type="boolean"              />
+          <element name="isOnShortList"     type="boolean" minOccurs="0"/>
+          <element name="isOnStdList"       type="boolean" minOccurs="0"/>
+          <element name="isOnMiniList"      type="boolean" minOccurs="0"/>
+          <element name="numberOfNulls"     type="integer" minOccurs="0"/>
+          <element name="minimumValue"      type="double"  minOccurs="0"/>
+          <element name="maximumValue"      type="double"  minOccurs="0"/>
+          <element name="meanValue"         type="double"  minOccurs="0"/>
+          <element name="stdDev"            type="double"  minOccurs="0"/>
+          <element name="notes"             type="string"  minOccurs="0"/>
+        </sequence>
+      </complexType>
+
+      <complexType name="CatalogSchemaArray">
+        <complexContent>
+          <element name="schema" type="tns:CatalogSchemaElement" 
+		   maxOccurs="unbounded"/>
+        </complexContent>
+      </complexType>
+
+      <complexType name="CatalogSearchRequest">
+        <sequence>
+          <element name="serverName"     type="string"/>
+          <element name="databaseName"   type="string"/>
+          <element name="catalogName"    type="string"/>
+          <element name="SQL"            type="string"/>
+          <element name="searchRadius"   type="double"/>
+          <element name="searchLocation" type="string"/>
+        </sequence>
+      </complexType>
+
+      <complexType name="CatalogSearchResponse">
+        <sequence>
+          <element name="recordCount" type="integer"/>
+          <element name="URL"         type="string" />
+        </sequence>
+      </complexType>
+
+      <complexType name="CatalogQueryID">
+        <sequence>
+          <element name="ID"          type="string"/>
+        </sequence>
+      </complexType>
+    </schema>
+  </types>
+
+
+
+
+  <!-- 
+       MESSAGES  -  How the above data structures are bundled up
+       as a set of messages.  Since our service is pretty simple,
+       this is pretty much a one-to-one correspondence (as is true
+       for most services we've seen to date)
+  -->
+
+  <message name="getCatalogList">
+    <documentation>
+      No arguments; we just want the list
+    </documentation>
+  </message>
+
+  <message name="returnCatalogList">
+    <part name="list"       type="tns:CatalogInfoArray"     />
+  </message>
+
+  <message name="getCatalogSchema">
+    <part name="catalog"    type="tns:CatalogSchemaRequest" />
+  </message>
+
+  <message name="returnCatalogSchema">
+    <part name="schema"     type="tns:CatalogSchemaArray"   />
+  </message>
+
+  <message name="doCatalogSearch">
+    <part name="request"    type="tns:CatalogSearchRequest" />
+  </message>
+
+  <message name="returnCatalogData">
+    <part name="sourcelist" type="tns:CatalogSearchResponse"/>
+  </message>
+
+  <message name="queryIdInfo">
+    <part name="id"         type="tns:CatalogQueryID"/>
+  </message>
+
+
+
+
+  <portType name="CatalogSearchPort">
+    <documentation>
+
+       SERVICE "METHODS"  -  The actual set of operations the 
+       service is capable of supporting.  For each we can have a 
+       message that goes in and a message that comes out (though
+       not always both; see for instance the background search 
+       submission / notification operations).
+
+    </documentation>
+
+    <operation name="getCatalogList">
+      <input  message="tns:getCatalogList"/>
+      <output message="tns:returnCatalogList"/>
+    </operation>
+
+    <operation name="getCatalogSchema">
+      <input  message="tns:getCatalogSchema"/>
+      <output message="tns:returnCatalogSchema"/>
+    </operation>
+
+    <operation name="submitForegroundCatalogSearch">
+      <input  message="tns:doCatalogSearch"/>
+      <output message="tns:returnCatalogData"/>
+    </operation>
+
+    <operation name="submitBackgroundCatalogSearch">
+      <input  message="tns:doCatalogSearch"/>
+      <output message="tns:queryID"/>
+    </operation>
+
+    <operation name="getBackgroundCatalogSearchStatus">
+      <input  message="tns:queryID"/>
+      <output message="tns:returnCatalogData"/>
+      <fault  message="xsd:string"/>
+    </operation>
+
+  </portType>
+
+
+
+  
+  <binding name="CatalogSearchBinding" type="tns:CatalogSearchPort">
+
+    <documentation>
+      
+      TRANSLATION TO WIRE FORMAT (BINDING)  -  There are a number of 
+      ways the messages could be formatted when talking to the service.
+      This is where we get explicit about what the service can handle.
+      SOAP is the simplest match to the data structures we've defined
+      (XML going into XML) but most of our existing services are 
+      HTTP GET/POST, so I've opted for using that as the illustration
+      here.
+   
+    </documentation>
+
+    <http:binding verb="GET"/>
+
+    <operation name="getCatalogList">
+      <http:operation location="cgi-bin/Oasis/CatList/nph-catlist"/>
+      <input>
+         <http:urlEncoded/>
+      </input>
+      <output>
+         <mime:content type="text/xml"/>
+      </output>
+    </operation>
+
+
+    <operation name="getCatalogSchema">
+      <http:operation location="cgi-bin/Oasis/DD/nph-dd"/>
+      <input>
+         <http:urlEncoded/>
+      </input>
+      <output>
+         <mime:content type="text/xml"/>
+      </output>
+    </operation>
+
+
+    <operation name="submitForegroundCatalogSearch">
+      <http:operation location="cgi-bin/Oasis/CatSearch/nph-catsearch"/>
+      <input>
+         <http:urlEncoded/>
+      </input>
+      <output>
+         <mime:content type="text/plain"/>
+      </output>
+    </operation>
+
+
+    <operation name="submitBackgroundCatalogSearch">
+      <http:operation location="cgi-bin/Oasis/CatSearch/nph-bgcatsearch"/>
+      <input>
+         <http:urlEncoded/>
+      </input>
+      <output>
+         <mime:content type="text/plain"/>
+      </output>
+    </operation>
+
+
+    <operation name="getBackgroundCatalogSearchStatus">
+      <http:operation location="cgi-bin/Oasis/CatList/nph-catsearchstatus"/>
+      <input>
+         <http:urlEncoded/>
+      </input>
+      <output>
+         <mime:content type="text/plain"/>
+      </output>
+      <fault>
+         <mime:content type="text/plain"/>
+      </fault>
+    </operation>
+
+  </binding>
+
+
+
+
+  <service name="CatalogSearchService">
+    <port name="CatalogSearchPort" binding="tns:CatalogSearchBinding">
+      <http:address location="http://irsa.ipac.caltech.edu/"/>
+    </port>
+  </service>
+</definitions>
