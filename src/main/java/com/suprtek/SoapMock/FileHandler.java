@@ -15,113 +15,58 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
-
-
 public class FileHandler {
 
-	private String topLevelPath;
-	
-	public FileHandler(String TopLevelPath)
-	{
-		topLevelPath = TopLevelPath;
-		
-	}
-	
-	public String getWSDL(String path)
-	{		
-		
-		return readFile(topLevelPath + path+path.substring(path.lastIndexOf('/')) +".wsdl").replace('/', '\\');		
-	}	
-	
-	
-	private void scanWSDLs(String path)
-	{
-		File curDir = new File(path);
-		
-		if (!curDir.exists())
-		{
-			return;
-		}
-		
-		for ( File target : curDir.listFiles())
-		{
-			if (target.isDirectory())
-			{
-				scanWSDLs(target.getAbsolutePath());
-				continue;
-			}
-			
-			if (target.getName().endsWith(".wsdl"))
-			{
-				//there is a wsdl here, parse it for actions, and check to see if they exist.
-			}
-			continue;
-		}
-		
-	}
-	
-	private void readWSDL(File file)
-	{
-		/* Unwritten, planned for version 2*/
-		
-	}
-	
-	private String readFile(String path)
-	{
-		File file = new File(path);		
-		boolean isFileInvalid = file == null || file.exists() == false;
-		if (isFileInvalid)
-			return null;
-		
-		byte[] returnMe = null;
-		try {
-			returnMe = Files.readAllBytes(file.toPath());
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		return new String(returnMe);		
+	String topLevelPath;
 
+	public FileHandler(String TopLevelPath) {
+		topLevelPath = TopLevelPath;
 	}
-	
-	public String createResponse(String request, String path)
-	{
+
+	public String getWSDL(String path) {
+		return getWSDL(path, new FileContentGetter());
+	}
+
+	String getWSDL(String path, FileContentGetter fileContentGetter) {
+		String fullPath = (topLevelPath + path + path.substring(path.lastIndexOf(File.separatorChar)) + ".wsdl").replace('/', '\\');
+		return fileContentGetter.getFileContents(fullPath);
+	}
+
+	public String createResponse(String request, String path) {
 		String requestName = getRequestName(request);
-		
-		String result = readFile(topLevelPath + path +"/" + requestName + ".soap" );
-		
-		if (result == null)
-		{
-			result = readFile(topLevelPath + "/Fault.soap");
+
+		FileContentGetter fileContentGetter = new FileContentGetter();
+		String result = fileContentGetter.getFileContents(topLevelPath + path + File.separator + requestName + ".soap");
+
+		if (result == null) {
+			result = fileContentGetter.getFileContents(topLevelPath + "/Fault.soap");
 			System.out.println("Fault: " + result);
 		}
 		return result;
-		
 	}
-	
-	private String getRequestName(String request)
-	{
+
+	private String getRequestName(String request) {
 		DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
 		System.out.println(request);
 		try {
 			DocumentBuilder db = dbf.newDocumentBuilder();
-			Document dom = db.parse(new ByteArrayInputStream(request.getBytes("UTF-8")));
-			
+			Document dom = db.parse(new ByteArrayInputStream(request
+					.getBytes("UTF-8")));
+
 			NodeList nodes = dom.getElementsByTagName("wsa:Action");
 			if (nodes == null)
 				return null;
-					
-			
+
 			nodes = nodes.item(0).getChildNodes();
 			if (nodes == null)
 				return null;
 			Node node = nodes.item(0);
-			
+
 			if (node == null)
 				return null;
-			
+
 			return node.getTextContent();
-			
-			
+
 		} catch (ParserConfigurationException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -135,7 +80,7 @@ public class FileHandler {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
+
 		return null;
 	}
 }
