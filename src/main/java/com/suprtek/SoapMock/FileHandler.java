@@ -30,7 +30,7 @@ public class FileHandler {
 	public String getWSDL(String path)
 	{		
 		
-		return readFile(topLevelPath + path+path +".wsdl");		
+		return readFile(topLevelPath + path+path.substring(path.lastIndexOf('/')) +".wsdl").replace('/', '\\');		
 	}	
 	
 	
