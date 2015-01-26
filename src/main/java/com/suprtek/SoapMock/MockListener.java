@@ -1,6 +1,5 @@
 package com.suprtek.SoapMock;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
@@ -27,13 +26,14 @@ public class MockListener extends NanoHTTPD {
 
 		String query = getQueryFromSession(session);
 
-		if (query != null) {
-			boolean requestIsForWsdl = query.equals("wsdl")
-					&& (getBodyText(session) == null);
-			if (requestIsForWsdl) {
-				System.out.println("requestIsForWsdl");
+		if (query.equals("wsdl"))
+		{
+			String bodyText = getBodyText(session);
+			boolean requestIsForWsdl = (bodyText == null);
+			if (requestIsForWsdl)
 				return getWsdl(session);
-			}
+			else
+				return getResponse(session,bodyText);
 		}
 
 		System.out.println("requestIsForWsdl");
@@ -44,11 +44,10 @@ public class MockListener extends NanoHTTPD {
 	private String getBodyText(IHTTPSession session) {
 		String returnMe = null;
 		try {
-			if (session.getInputStream().available() > 0) {
-				byte[] bodyBytes = new byte[session.getInputStream()
-						.available()];
-				session.getInputStream().read(bodyBytes, 0,
-						session.getInputStream().available() - 1);
+			if (session.getInputStream().available() > 0)
+			{
+				byte[] bodyBytes = new byte[session.getInputStream().available()];
+				session.getInputStream().read(bodyBytes, 0, session.getInputStream().available());
 				returnMe = new String(bodyBytes);
 			}
 		} catch (IOException e) {
@@ -72,6 +71,12 @@ public class MockListener extends NanoHTTPD {
 				files.getWSDL(session.getUri()));
 	}
 
+	private Response getResponse(IHTTPSession session, String request) {
+		FileHandler files = new FileHandler();
+		files.serveResponse(request, session.getUri());
+		return null;
+	}
+	
 	private Response getResponse(IHTTPSession session) {
 		// hash the request message
 		Map<String, String> parsedBody = new HashMap<String, String>();
