@@ -1,4 +1,3 @@
-
 package com.suprtek.SoapMock;
 
 import static org.junit.Assert.*;
@@ -14,8 +13,8 @@ public class LauncherTest {
 	@Test
 	public void testLaunch() {
 		MockListener mockListener = mock(MockListener.class);
-		Launcher testObject = new Launcher(8080);
-				
+		Launcher testObject = new Launcher(8080, mockListener);
+
 		try {
 			verify(mockListener).start();
 		} catch (IOException e) {
@@ -23,5 +22,4 @@ public class LauncherTest {
 			fail();
 		}
 	}
-
 }

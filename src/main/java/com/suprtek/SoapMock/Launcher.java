@@ -5,25 +5,32 @@ import java.io.IOException;
 public class Launcher {
 
 	public Launcher(int port) {
-		launch(new MockListener(port));
+		launch(new MockListener(port), true);
 	}
 
-	void launch(MockListener mock) {
+	Launcher(int port, MockListener mockListener) {
+		launch(mockListener, false);
+	}
+
+	void launch(MockListener mockListener, boolean productionRun) {
 		try {
-			mock.start();
+			mockListener.start();
+			keepAlive(productionRun);
 		} catch (IOException e) {
 			e.printStackTrace();
+		} finally {
+			mockListener.stop();
 		}
-		 keepAlive();
+
 	}
 
-	private void keepAlive() {
-		while (true)
-		 try {
-		 Thread.sleep(100);
-		 } catch (InterruptedException e) {
-		 e.printStackTrace();
-		 }
+	private void keepAlive(boolean productionRun) {
+		while (productionRun)
+			try {
+				Thread.sleep(100);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
 	}
 
 }

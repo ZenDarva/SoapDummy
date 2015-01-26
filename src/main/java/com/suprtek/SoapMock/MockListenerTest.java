@@ -32,6 +32,8 @@ public class MockListenerTest {
 		} catch (IOException e) {
 			e.printStackTrace();
 			fail();
+		}finally{
+			testObject.stop();;
 		}
 		assertEquals(testPortValue, testObject.getListeningPort());
 	}
