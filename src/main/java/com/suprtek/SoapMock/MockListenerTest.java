@@ -4,7 +4,6 @@ import static org.junit.Assert.*;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
 
 import org.junit.Test;
 
@@ -12,8 +11,9 @@ import fi.iki.elonen.NanoHTTPD;
 import fi.iki.elonen.NanoHTTPD.IHTTPSession;
 import fi.iki.elonen.NanoHTTPD.Response;
 import fi.iki.elonen.NanoHTTPD.Response.Status;
-import static org.mockito.Mockito.*
-;public class MockListenerTest {
+import static org.mockito.Mockito.*;
+
+public class MockListenerTest {
 
 	@Test
 	public void testMockListener_hasPortNegativeOneBeforeStarted() {
@@ -22,7 +22,7 @@ import static org.mockito.Mockito.*
 		int expectedValue = -1;
 		assertEquals(expectedValue, testObject.getListeningPort());
 	}
-	
+
 	@Test
 	public void testMockListener_hasPortSetAfterStarted() {
 		int testPortValue = 8080;
@@ -43,15 +43,16 @@ import static org.mockito.Mockito.*
 		IHTTPSession mockihttpSession = mock(IHTTPSession.class);
 		when(mockihttpSession.getUri()).thenReturn(".ico");
 		Response testResult = testObject.serve(mockihttpSession);
-		Response expectedResult = new NanoHTTPD.Response(":("); 
-		
+		Response expectedResult = new NanoHTTPD.Response(":(");
+
 		assertEquals(testResult.getClass(), expectedResult.getClass());
 		assertEquals(testResult.getMimeType(), expectedResult.getMimeType());
-		assertEquals(testResult.getRequestMethod(), expectedResult.getRequestMethod());
+		assertEquals(testResult.getRequestMethod(),
+				expectedResult.getRequestMethod());
 		assertEquals(testResult.getStatus(), expectedResult.getStatus());
-		
+
 	}
-	
+
 	@Test
 	public void testServeIHTTPSession_WsdlRequests() {
 		int testPortValue = 8080;
@@ -71,17 +72,19 @@ import static org.mockito.Mockito.*
 		} catch (IOException e) {
 			fail();
 		}
-		
+
 		Response testResult = testObject.serve(mockihttpSession);
-		
+
 		FileHandler files = new FileHandler("C:\\temp");
-		Response expectedResult =  new NanoHTTPD.Response(Status.OK, "text/xml", files.getWSDL(mockihttpSession.getUri()));
-		
+		Response expectedResult = new NanoHTTPD.Response(Status.OK, "text/xml",
+				files.getWSDL(mockihttpSession.getUri()));
+
 		assertEquals(testResult.getClass(), expectedResult.getClass());
 		assertEquals(testResult.getMimeType(), expectedResult.getMimeType());
-		assertEquals(testResult.getRequestMethod(), expectedResult.getRequestMethod());
+		assertEquals(testResult.getRequestMethod(),
+				expectedResult.getRequestMethod());
 		assertEquals(testResult.getStatus(), expectedResult.getStatus());
-		
+
 	}
-	
+
 }

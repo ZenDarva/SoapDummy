@@ -3,22 +3,22 @@ package com.suprtek.SoapMock;
 public class Main {
 
 	public static void main(String[] args) {
-		String argument0 = getArg0(args);
-		new Launcher(getPortArgumnet(argument0));
+		String argument0 = getArgument0(args);
+		new Launcher(getPortFromString(argument0));
 	}
 
-	private static int getPortArgumnet(String portString) {
+	private static int getPortFromString(String portString) {
 		int defaultPortValue = 8080;
 		int portInt;
 		try {
 			portInt = Integer.parseInt(portString);
-		} catch (NumberFormatException | ArrayIndexOutOfBoundsException arrayIndexOutOfBoundsException) {
+		} catch (NumberFormatException numberFormatException) {
 			portInt = defaultPortValue;
 		}
 		return portInt;
 	}
 
-	private static String getArg0(String[] args) {
+	private static String getArgument0(String[] args) {
 		String argument0;
 		try {
 			argument0 = args[0];

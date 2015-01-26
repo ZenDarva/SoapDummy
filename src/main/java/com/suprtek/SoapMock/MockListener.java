@@ -1,5 +1,6 @@
 package com.suprtek.SoapMock;
 
+import java.io.File;
 import java.io.IOException;
 
 import fi.iki.elonen.NanoHTTPD;
@@ -58,7 +59,8 @@ public class MockListener extends NanoHTTPD {
 	}
 
 	private Response getWsdl(IHTTPSession session) {
-		FileHandler files = new FileHandler("C:\\temp");
+		ResponseDirectoryGetter responseDirectoryGetter = new ResponseDirectoryGetter();
+		FileHandler files = new FileHandler(responseDirectoryGetter.getResponsesDirectoryPath());
 		return new NanoHTTPD.Response(Status.OK, "text/xml", files.getWSDL(session.getUri()));
 	}
 	private Response getResponse(IHTTPSession session, String request) {
@@ -68,5 +70,10 @@ public class MockListener extends NanoHTTPD {
 		return null;
 	}
 	
+	private Response getResponse(IHTTPSession session) {
+		ResponseDirectoryGetter responseDirectoryGetter = new ResponseDirectoryGetter();
+		FileHandler files = new FileHandler(responseDirectoryGetter.getResponsesDirectoryPath());
+		return new NanoHTTPD.Response(Status.OK, "text/xml", files.getWSDL(session.getUri()));
+	}
 	
 }
