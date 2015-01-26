@@ -50,8 +50,11 @@ public class FileHandlerTest {
 	}
 
 //	@Test
-//	public void testCreateResponse() {
-//		fail("Not yet implemented");
+//	public void testCreateResponse_throwsExceptionOnBadlyFormattedRequest() {
+//		String testPath = "testPathValue";
+//		FileHandler testFileHandler = new FileHandler(testPath);
+//		
+//		testFileHandler.createResponse("request", "path");
 //	}
 
 }

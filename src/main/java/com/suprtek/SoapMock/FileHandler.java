@@ -39,7 +39,7 @@ public class FileHandler {
 		String result = fileContentGetter.getFileContents(topLevelPath + path + File.separator + requestName + ".soap");
 
 		if (result == null) {
-			result = fileContentGetter.getFileContents(topLevelPath + "/Fault.soap");
+			result = fileContentGetter.getFileContents(topLevelPath + File.separator + "Fault.soap");
 			System.out.println("Fault: " + result);
 		}
 		return result;
