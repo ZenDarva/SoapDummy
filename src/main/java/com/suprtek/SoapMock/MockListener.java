@@ -22,11 +22,12 @@ public class MockListener extends NanoHTTPD {
 
 		if (query.equals("wsdl"))
 		{
-			boolean requestIsForWsdl = (getBodyText(session) == null);
+			String bodyText = getBodyText(session);
+			boolean requestIsForWsdl = (bodyText == null);
 			if (requestIsForWsdl)
 				return getWsdl(session);
 			else
-				return getResponse();
+				return getResponse(session,bodyText);
 		}
 
 		return new NanoHTTPD.Response("Something went wrong.");
@@ -39,7 +40,7 @@ public class MockListener extends NanoHTTPD {
 			if (session.getInputStream().available() > 0)
 			{
 				byte[] bodyBytes = new byte[session.getInputStream().available()];
-				session.getInputStream().read(bodyBytes, 0, session.getInputStream().available()-1);
+				session.getInputStream().read(bodyBytes, 0, session.getInputStream().available());
 				returnMe = new String(bodyBytes);
 			}
 		} catch (IOException e) {
@@ -60,8 +61,10 @@ public class MockListener extends NanoHTTPD {
 		FileHandler files = new FileHandler("C:\\temp");
 		return new NanoHTTPD.Response(Status.OK, "text/xml", files.getWSDL(session.getUri()));
 	}
-	private Response getResponse() {
+	private Response getResponse(IHTTPSession session, String request) {
 		// TODO Implement
+		FileHandler files = new FileHandler("C:\\temp");
+		files.serveResponse(request, session.getUri());
 		return null;
 	}
 	

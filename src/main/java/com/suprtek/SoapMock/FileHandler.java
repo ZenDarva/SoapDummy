@@ -1,17 +1,20 @@
 package com.suprtek.SoapMock;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URISyntaxException;
-import java.net.URL;
+import java.io.UnsupportedEncodingException;
 import java.nio.file.Files;
 
-import org.ow2.easywsdl.wsdl.WSDLFactory;
-import org.ow2.easywsdl.wsdl.api.Description;
-import org.ow2.easywsdl.wsdl.api.Service;
-import org.ow2.easywsdl.wsdl.api.WSDLException;
-import org.ow2.easywsdl.wsdl.api.WSDLReader;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+
+import org.w3c.dom.Document;
+import org.w3c.dom.NodeList;
+import org.xml.sax.SAXException;
+
+
 
 public class FileHandler {
 
@@ -20,9 +23,7 @@ public class FileHandler {
 	public FileHandler(String TopLevelPath)
 	{
 		topLevelPath = TopLevelPath;
-		System.out.println("topLevelPath: " + topLevelPath);
 		
-		scanWSDLs(TopLevelPath);
 	}
 	
 	public String getWSDL(String path)
@@ -70,25 +71,46 @@ public class FileHandler {
 	
 	private void readWSDL(File file)
 	{
+		/* Unwritten, planned for version 2*/
+		
+	}
+	
+	public void serveResponse(String request, String path)
+	{
+		getRequestName(request);
+	}
+	
+	private String getRequestName(String request)
+	{
+		DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+		System.out.println(request);
 		try {
-			WSDLReader reader = WSDLFactory.newInstance().newWSDLReader();
-			Description desc = reader.read(new URL("File://"+file.getAbsolutePath()));
+			DocumentBuilder db = dbf.newDocumentBuilder();
+			Document dom = db.parse(new ByteArrayInputStream(request.getBytes("UTF-8")));
 			
-			Service serv = desc.getServices().get(0);
-			System.out.println("test");
-		} catch (WSDLException e) {
+			/*NodeList nodes = dom.getElementsByTagName("wsa:Action")*/ //This may or may not work in all situations.  Replaced by code below, if shown to work, switch back.
+			
+			NodeList nodes = dom.getDocumentElement().getChildNodes();
+			for (int count = 0; count < nodes.getLength(); count++)
+			{
+				System.out.println(nodes.item(count).getNodeName());
+			}
+			
+			
+		} catch (ParserConfigurationException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		} catch (MalformedURLException e) {
+		} catch (UnsupportedEncodingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (SAXException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		} catch (URISyntaxException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
 		}
 		
+		return null;
 	}
 }
