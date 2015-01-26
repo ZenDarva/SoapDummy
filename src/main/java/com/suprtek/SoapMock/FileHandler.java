@@ -11,6 +11,7 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.w3c.dom.Document;
+import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
@@ -28,18 +29,8 @@ public class FileHandler {
 	
 	public String getWSDL(String path)
 	{		
-		File wsdlFile = new File(topLevelPath + path+path +".wsdl");		
-		boolean wsdlFileInvalid = wsdlFile == null || wsdlFile.exists() == false;
-		if (wsdlFileInvalid)
-			return null;
 		
-		byte[] returnMe = null;
-		try {
-			returnMe = Files.readAllBytes(wsdlFile.toPath());
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		return new String(returnMe);		
+		return readFile(topLevelPath + path+path +".wsdl");		
 	}	
 	
 	
@@ -75,9 +66,36 @@ public class FileHandler {
 		
 	}
 	
-	public void serveResponse(String request, String path)
+	private String readFile(String path)
 	{
-		getRequestName(request);
+		File file = new File(path);		
+		boolean isFileInvalid = file == null || file.exists() == false;
+		if (isFileInvalid)
+			return null;
+		
+		byte[] returnMe = null;
+		try {
+			returnMe = Files.readAllBytes(file.toPath());
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return new String(returnMe);		
+
+	}
+	
+	public String createResponse(String request, String path)
+	{
+		String requestName = getRequestName(request);
+		
+		String result = readFile(topLevelPath + path +"/" + requestName + ".soap" );
+		
+		if (result == null)
+		{
+			result = readFile(topLevelPath + "/Fault.soap");
+			System.out.println("Fault: " + result);
+		}
+		return result;
+		
 	}
 	
 	private String getRequestName(String request)
@@ -88,13 +106,20 @@ public class FileHandler {
 			DocumentBuilder db = dbf.newDocumentBuilder();
 			Document dom = db.parse(new ByteArrayInputStream(request.getBytes("UTF-8")));
 			
-			/*NodeList nodes = dom.getElementsByTagName("wsa:Action")*/ //This may or may not work in all situations.  Replaced by code below, if shown to work, switch back.
+			NodeList nodes = dom.getElementsByTagName("wsa:Action");
+			if (nodes == null)
+				return null;
+					
 			
-			NodeList nodes = dom.getDocumentElement().getChildNodes();
-			for (int count = 0; count < nodes.getLength(); count++)
-			{
-				System.out.println(nodes.item(count).getNodeName());
-			}
+			nodes = nodes.item(0).getChildNodes();
+			if (nodes == null)
+				return null;
+			Node node = nodes.item(0);
+			
+			if (node == null)
+				return null;
+			
+			return node.getTextContent();
 			
 			
 		} catch (ParserConfigurationException e) {

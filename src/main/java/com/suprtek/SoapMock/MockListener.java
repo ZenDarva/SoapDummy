@@ -66,8 +66,8 @@ public class MockListener extends NanoHTTPD {
 	private Response getResponse(IHTTPSession session, String request) {
 		// TODO Implement
 		FileHandler files = new FileHandler("C:\\temp");
-		files.serveResponse(request, session.getUri());
-		return null;
+		
+		return new NanoHTTPD.Response(Status.OK, "text/xml", files.createResponse(request, session.getUri())); 
 	}
 	
 	private Response getResponse(IHTTPSession session) {
