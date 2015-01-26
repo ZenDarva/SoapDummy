@@ -10,7 +10,6 @@ import org.junit.Test;
 import fi.iki.elonen.NanoHTTPD;
 import fi.iki.elonen.NanoHTTPD.IHTTPSession;
 import fi.iki.elonen.NanoHTTPD.Response;
-import fi.iki.elonen.NanoHTTPD.Response.Status;
 import static org.mockito.Mockito.*;
 
 public class MockListenerTest {
@@ -77,9 +76,7 @@ public class MockListenerTest {
 
 		Response testResult = testObject.serve(mockihttpSession);
 
-		FileHandler files = new FileHandler("C:\\temp");
-		Response expectedResult = new NanoHTTPD.Response(Status.OK, "text/xml",
-				files.getWSDL(mockihttpSession.getUri()));
+		Response expectedResult = new NanoHTTPD.Response("text/xml");
 
 		assertEquals(testResult.getClass(), expectedResult.getClass());
 		assertEquals(testResult.getMimeType(), expectedResult.getMimeType());

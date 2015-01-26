@@ -4,8 +4,7 @@ package com.suprtek.SoapMock;
 import java.io.IOException;
 
 import fi.iki.elonen.NanoHTTPD;
-import fi.iki.elonen.NanoHTTPD.Response.Status;
-
+import com.suprtek.SoapMock.WSDLGetter;
 public class MockListener extends NanoHTTPD {
 
 	public MockListener(int port) {
@@ -27,11 +26,12 @@ public class MockListener extends NanoHTTPD {
 			boolean requestIsForWsdl = (bodyText == null);
 			if (requestIsForWsdl){
 				WSDLGetter wsdlGetter = new WSDLGetter();
-				return wsdlGetter.getWsdl(session);
+				Response returnMe = wsdlGetter.getWsdl(session, System.getProperty("user.dir"));
+				return returnMe;
 			}
 			else{
 				SOAPResponseGetter soapResponseGetter = new SOAPResponseGetter();
-				return soapResponseGetter.getResponse(session,bodyText);
+				return soapResponseGetter.getResponse(session,bodyText, System.getProperty("user.dir"));
 			}
 				
 		}
