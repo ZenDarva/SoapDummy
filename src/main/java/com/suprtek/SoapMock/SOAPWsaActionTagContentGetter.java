@@ -13,7 +13,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
-public class SOAPRequestNameGetter {
+public class SOAPWsaActionTagContentGetter {
 	public String getRequestName(String request) {
 		DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
 		System.out.println(request);
@@ -26,7 +26,7 @@ public class SOAPRequestNameGetter {
 			if (nodes == null)
 				return null;
 
-			nodes = nodes.item(0).getChildNodes();
+			nodes = nodes.item(0).getChildNodes(); // nullpointer exception here when <wsa:Action> tag is absent from request.
 			if (nodes == null)
 				return null;
 			Node node = nodes.item(0);

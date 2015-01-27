@@ -20,7 +20,8 @@ public class MockListener extends NanoHTTPD {
 		
 		String query = getQueryFromSession(session);
 
-		if (query.equals("wsdl"))
+		boolean queryIsForWsdl = query != null && query.equals("wsdl");
+		if (queryIsForWsdl)
 		{
 			String bodyText = getBodyText(session);
 			boolean requestIsForWsdl = (bodyText == null);
@@ -28,15 +29,15 @@ public class MockListener extends NanoHTTPD {
 				WSDLGetter wsdlGetter = new WSDLGetter();
 				Response returnMe = wsdlGetter.getWsdl(session, System.getProperty("user.dir"));
 				return returnMe;
-			}
-			else{
-				SOAPResponseGetter soapResponseGetter = new SOAPResponseGetter();
-				return soapResponseGetter.getResponse(session,bodyText, System.getProperty("user.dir"));
-			}
-				
-		}
+			}				
+		}else{
+			String bodyText = getBodyText(session);
+			SOAPResponseGetter soapResponseGetter = new SOAPResponseGetter();
+			return soapResponseGetter.getResponse(session,bodyText, System.getProperty("user.dir"));
 
-		return new NanoHTTPD.Response("Something went wrong.");
+		}
+		return null;
+
 	}
 	
 
